@@ -1,11 +1,12 @@
-
 library(openxlsx); #load the Excel Library
 library(stats)
-InputData = read.xlsx("/Users/Tiffany/Desktop/Project Files/AB Testing/Continuous Consumption.xlsx", sheet = "R data set")
 
-str(InputData)
-ControlGroup <- InputData[InputData$Variation.Title == "Control Group",]
-TreatmentGroup <- InputData[InputData$Variation.Title == "No Continuous Consumption",]
+InputData = read.xlsx("/Users/Tiffany/Desktop/Data_format_example.xlsx", sheet = "Sheet1")
+
+Results <- c()
+
+#add all metrics to compare below
+metric <- c("PV/V","V/UV")
 
 #Assuming normal distribution and large sample size & using a z-test
 #Assume variances are equal for both populations
@@ -17,15 +18,22 @@ Std_Approx <- function(m1,m2,n1,n2,m0=0, conf_level=.95){
   return(abs(s_pooled)) 
 }
 
-m1 <- TreatmentGroup[,"PV/V"]
-m2 <- ControlGroup[,"PV/V"]
+for (i in 1:length(metric)){
+  Data_filtered <- InputData[InputData$metric == metric[i],]
+  Data_filtered[order(Data_filtered$Comparison),]
+  m1 <- Data_filtered$Control
+  m2 <- Data_filtered$Treatment
+  
+  n1 <- Data_filtered$n_Control
+  n2 <- Data_filtered$n_Treat
+  Results <- cbind(Results, Std_Approx(m1,m2,n1,n2))
+  colnames(Results)[i] <- metric[i]
+  rownames(Results) <- Data_filtered$Comparison
+  Sp_Results <- Results
+}
 
-n1 <- TreatmentGroup[,"new_session_start.(hits)"]
-n2 <- ControlGroup[,"new_session_start.(hits)"]
+Sp_Results
 
-Results <- Std_Approx(m1,m2,n1,n2)
-names(Results) <- paste("comp", 1:length(Results), sep = "")
-Results
 
 #Simulation
 n_1 = 140491
