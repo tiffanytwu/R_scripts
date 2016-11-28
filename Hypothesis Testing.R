@@ -5,7 +5,7 @@
 # 1. The data is normally distributed
 # 2. Samples are iid
 
-# Data to perform the test on
+# Dummy Data
 data_vector <- c(63, 75, 84, 58, 52, 96, 63, 55, 76, 83)
 
 # Null Hypothesis
@@ -103,4 +103,56 @@ pairwise.t.test(y, group, p.adjust = "bonferroni") #Bonferroni correction
 #TukeyHSD CI
 Tukey <- TukeyHSD(aov(fit),conf.level =0.95) #significant differences group1 with group3 (doesn't contain 0, differencs > 0)
 plot(Tukey)
+
+##########################################################################
+#                             Chi-Square Test
+##########################################################################
+# (1) Test of Independence: used to test if there's an association between categories within a population
+# 1 population, 2 variables 
+# DF = (#Rows - 1)(# Columns - 1)
+
+#E.g. Is smoking habit associated with exercise frequency?
+#Hypothesis:
+#H0: smoking habit and exercise frquency are independent
+#Ha: smoking habit and exercise frequency are associated
+
+smoke <- c(rep("Heavy", 11), rep("Never", 189), rep("Occasionally", 19), rep("Regularly", "17"))
+exercise <- c(rep("Freq", 7), rep("None", 1), rep("Some",3),rep("Freq", 87), rep("None", 18), rep("Some",84), rep("Freq", 12), rep("None", 3), rep("Some",4), rep("Freq", 9), rep("None", 1), rep("Some",7))
+data <- cbind.data.frame(smoke, exercise)
+table(data)
+
+chisq.test(table(data)) # Note: observed frequencies < 5
+
+
+#(2) Test for Goodness of fit: used to determine if the sample was drawn from a specified distribution
+# In other words, used to see if an unknown distribution is different from a known distribution
+# 2 samples, 1 categorical variable
+# DF = Number of Categories - 1
+#H0: The population distribution of the variable is the same as the proposed
+#Ha: The popultion distributions are different
+
+#Q: Are observed frequencies far enough from expected to conclude that distributions differ?
+#chi-square value: measures how far the observed is from the expected
+#E.g. 
+#H0: Die is fair (uniform distribution, all values equally likely to occur)
+#Ha: Dies is not fair
+
+#Test for even distribution 
+rand_samp <- c(25,32,18,20)
+chisq.test(rand_samp) #by default, test for uniform distribution
+
+#Test distribution of class 1 and 2 are double 3 and 4
+null_prob <- c(1/3,1/3,1/6, 1/6)
+freqs <- rand_samp
+results <- chisq.test(freqs, p=null_prob) #do not reject H0 
+
+
+#(3) Test for Homogeneity: used to see if several populations are homogeneous with respsect to some characterisitc i.e. variable
+# Two samples, one categorical variable
+#E.g. The same study was done last year, test to see if results this year matched last years to within limits of random sampling error
+
+new_freq <- c(30,28,28,11)
+old_freq <- rand_samp
+chisq.test(new_freq, p=old_freq/sum(old_freq)) #significantly different from what was observed last year
+
 
