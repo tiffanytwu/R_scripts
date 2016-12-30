@@ -3,6 +3,9 @@
 set.seed(12344)
 
 #Birthday Problem
+#p(n) = 365*364*...*(365-n+1)/365^n
+1-(prod(365:343)/365^23)
+
 #Simulation:
 #(1) Pick 23 random #'s from 1 to 365 where each number represents a birthday in the given year
 #(2) Check to see if any are equal -- any 2 people have the same birthday
@@ -34,7 +37,40 @@ plot(cumsum(toss), type = 'l')
 outcomes <- sapply(1:1000, function(i) sum(ifelse(runif(1000)>.5,1,-1)))
 hist(outcomes)
 
-#e.g.2 estimates
+#Bernoulli random variables
+# A Bernoulli trial is an experiment in which there are only 2 possible outcomes
+# A student who guesses on a multiple choice test question which has 5 options; 
+# the student may guess correctly with probability = 0.2 and incorrectly with 0.8
+# Suppose we wanted to know how well 150 students would do on a multiple choice test with 20Q's
+# Each question corresponds to an independent Bernoulli trial
+# We can simulate the correctness of the student for each question by generating an indep. unirom random number
+# If this number < 0.2 --> Correct; Otherwise --> Incorrect
+# Probability that a uniform random variable is < 0.2 is exactly 0.2, which is the same as prob of guessing correctly
+
+indexes <- 1:150
+class <- unlist(lapply(indexes, function(i){
+  guess <- runif(20)
+  correct.answers <- sum(guess < 0.2)/20
+}))
+hist(class)
+mean(class)
+sd(class)
+
+
+#E.g.2 Suppose you want to simulate a random sample from a distribution with density fx(x) = 3x^2, 0<x<1
+#Fx(x) = x^3 for 0<x<1 and F^-1(u) = u^1/3. If we generate n random uniform numbers as vectors u, 
+#then u^(1/3) is a vector of length n containing the sample x1...xn
+
+n = 1000
+u <- runif(n)
+head(u)
+x <- u^(1/3)
+head(x)
+hist(x, prob = TRUE, main = expression(f(x) == 3*x^2))
+y <- seq(0,1,.01)
+lines(y, 3*y^2) #density curve
+
+#e.g.3 estimates
 #Samples
 population <- c(rep(1,45), rep(0,55))
 samp <- sample(population, 1500, replace = TRUE)
@@ -53,7 +89,7 @@ mean(samples)
 sd(samples)
 summary(samples)
 
-#E.g.3 Estimate of slope
+#E.g.4 Estimate of slope
 model.y <- function(x, intercept, slope, sigma){
   y <- intercept + slope*x + rnorm(length(x), 0, sigma)
 }
